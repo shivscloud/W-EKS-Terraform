@@ -1,18 +1,41 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: aws-test
+---  
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
-metadata: 
+metadata:
   name: ebs-sc
 provisioner: ebs.csi.aws.com
-volumeBindingMode: WaitForFirstConsumer 
+volumeBindingMode: WaitForFirstConsumer
+
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: ebs-mysql-pv-claim
-spec: 
+  name: ebs-pvc
+spec:
   accessModes:
     - ReadWriteOnce
   storageClassName: ebs-sc
-  resources: 
+  resources:
     requests:
-      storage: 4Gi
+      storage: 10Gi
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ebs-pod
+spec:
+  containers:
+    - name: ebs-container
+      image: nginx
+      volumeMounts:
+        - mountPath: "/data"
+          name: ebs-volume
+  volumes:
+    - name: ebs-volume
+      persistentVolumeClaim:
+        claimName: ebs-pvc

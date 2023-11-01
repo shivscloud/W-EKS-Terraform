@@ -1,3 +1,10 @@
+aws eks --region us-east-1 update-kubeconfig --name my-eks-cluster
+
+
+Installations:
+You must have kubectl install on your local machines
+You must install the helm in your local machine where you are running the terraform code machine
+
 EBS CSI install:
 
 Attch the ebs policy to the eks nodes roles add permissions and atatch the policy.
