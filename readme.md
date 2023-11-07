@@ -1,4 +1,4 @@
-aws eks --region us-east-1 update-kubeconfig --name my-eks-cluster
+aws eks --region us-east-1 update-kubeconfig --name learnk8s
 
 
 Installations:
@@ -15,3 +15,5 @@ kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernete
 # Verify ebs-csi pods running
 kubectl get pods -n kube-system
 
+
+aws iam attach-role-policy --role-name aws-load-balancer-controller --policy-arn arn:aws:iam::aws:policy/AWSWAFFullAccess
