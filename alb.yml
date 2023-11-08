@@ -51,7 +51,7 @@ metadata:
     # Ingress Core Settings
     alb.ingress.kubernetes.io/scheme: internet-facing
     # Health Check Settings
-    alb.ingress.kubernetes.io/target-type: HTTP
+    alb.ingress.kubernetes.io/target-type: ip
     # alb.ingress.kubernetes.io/healthcheck-protocol: HTTP 
     # alb.ingress.kubernetes.io/healthcheck-port: traffic-port
     # alb.ingress.kubernetes.io/healthcheck-path: /index.html    
