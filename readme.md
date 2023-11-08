@@ -17,3 +17,7 @@ kubectl get pods -n kube-system
 
 
 aws iam attach-role-policy --role-name aws-load-balancer-controller --policy-arn arn:aws:iam::aws:policy/AWSWAFFullAccess
+
+
+****To Find EKS Addon on EKS cluster the command is below
+aws eks describe-addon-versions > addons.json
