@@ -1,73 +1,73 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app3-nginx-deployment
-  labels:
-    app: app3-nginx
+  name: flask-app
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: app3-nginx
+      app: flask-app
   template:
     metadata:
       labels:
-        app: app3-nginx
+        app: flask-app
     spec:
       containers:
-        - name: app3-nginx
-          image: stacksimplify/kubenginx:1.0.0
-          ports:
-            - containerPort: 80
+      - name: flask-container
+        image: rajeshsingam/prod-working-flask:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: DATABASE_URL
+          value: "postgres://raj:v41ULZUpiewfWDO46kvLCfxmIypuOtox@dpg-clsui5dcm5oc739chchg-a.oregon-postgres.render.com:5432/raj_bzr8"
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: app3-nginx-nodeport-service
-  labels:
-    app: app3-nginx
-  annotations:
-#Important Note:  Need to add health check path annotations in service level if we are planning to use multiple targets in a load balancer    
-#    alb.ingress.kubernetes.io/healthcheck-path: /index.html
+  name: flask-service
 spec:
-  type: NodePort
   selector:
-    app: app3-nginx
+    app: flask-app
   ports:
-    - port: 80
-      targetPort: 80
----
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
+  type: NodePort
 # Annotations Reference: https://kubernetes-sigs.github.io/aws-load-balancer-controller/latest/guide/ingress/annotations/
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ingress-basics
-  labels:
-    app: app3-nginx
+  name: ingress-cpr
   annotations:
     # Load Balancer Name
-    alb.ingress.kubernetes.io/load-balancer-name: ingress-basics2
-    #kubernetes.io/ingress.class: "alb" (OLD INGRESS CLASS NOTATION - STILL WORKS BUT RECOMMENDED TO USE IngressClass Resource) # Additional Notes: https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.3/guide/ingress/ingress_class/#deprecated-kubernetesioingressclass-annotation
+    alb.ingress.kubernetes.io/load-balancer-name: ingress-cpr
     # Ingress Core Settings
+    #kubernetes.io/ingress.class: "alb" (OLD INGRESS CLASS NOTATION - STILL WORKS BUT RECOMMENDED TO USE IngressClass Resource)
     alb.ingress.kubernetes.io/scheme: internet-facing
     # Health Check Settings
     alb.ingress.kubernetes.io/target-type: ip
     # alb.ingress.kubernetes.io/healthcheck-protocol: HTTP 
     # alb.ingress.kubernetes.io/healthcheck-port: traffic-port
-    # alb.ingress.kubernetes.io/healthcheck-path: /index.html    
+    #Important Note:  Need to add health check path annotations in service level if we are planning to use multiple targets in a load balancer    
     # alb.ingress.kubernetes.io/healthcheck-interval-seconds: '15'
     # alb.ingress.kubernetes.io/healthcheck-timeout-seconds: '5'
     # alb.ingress.kubernetes.io/success-codes: '200'
     # alb.ingress.kubernetes.io/healthy-threshold-count: '2'
-    # alb.ingress.kubernetes.io/unhealthy-threshold-count: '2'
+    # alb.ingress.kubernetes.io/unhealthy-threshold-count: '2'   
 spec:
-  ingressClassName: alb # Ingress Class
+  ingressClassName: alb   # Ingress Class 
   defaultBackend:
     service:
-      name: app3-nginx-nodeport-service
+      name: flask-service
       port:
-        number: 80                  
-      
-
-# 1. If  "spec.ingressClassName: my-aws-ingress-class" not specified, will reference default ingress class on this kubernetes cluster
-# 2. Default Ingress class is nothing but for which ingress class we have the annotation `ingressclass.kubernetes.io/is-default-class: "true"`      
+        number: 80                            
+  rules:
+    - http:
+        paths:           
+          - path: /app1
+            pathType: Prefix
+            backend:
+              service:
+                name: flask-service
+                port: 
+                  number: 80
